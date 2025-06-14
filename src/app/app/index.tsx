@@ -1,12 +1,13 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import HomeScreen from '../../auth/screens/HomeScreen';
 import { useAuth } from '../../auth/store/auth-store';
 
-export default function HomeScreen() {
-    const { logout, user } = useAuth();
+export default function AppScreen() {
+    const { logout } = useAuth();
 
     return (
         <View style={styles.container}>
-            <Text style={styles.welcome}>Bienvenido, {user?.name}</Text>
+            <HomeScreen />
             <TouchableOpacity style={styles.logoutButton} onPress={logout}>
                 <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
             </TouchableOpacity>
@@ -17,21 +18,13 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    welcome: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#1E3A8A',
-        marginBottom: 20,
+        backgroundColor: '#fff',
     },
     logoutButton: {
         backgroundColor: '#1E3A8A',
         padding: 15,
         borderRadius: 10,
-        width: '100%',
+        margin: 20,
         alignItems: 'center',
     },
     logoutButtonText: {

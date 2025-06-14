@@ -17,6 +17,7 @@ export interface User {
     phone: string;
     email: string;
     cooperative: Cooperative;
+    avatar: string
 }
 
 export interface AuthResponse {
