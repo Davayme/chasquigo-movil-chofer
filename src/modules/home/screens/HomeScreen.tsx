@@ -1,11 +1,6 @@
-import { Text, View } from "react-native";
+import React from 'react';
+import ScreenTest from '@/src/app/(extras)/screenTest';
 
-export default function ScreenTest() {
-  return (
-    <>
-      <View>
-        <Text>Hola</Text>
-      </View>
-    </>
-  );
+export default function HomeScreen() {
+  return <ScreenTest />;
 }
