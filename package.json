@@ -1,5 +1,5 @@
 {
-  "name": "chasquigo-movil-chofer",
+  "names": "chasquigo-movil-chofer",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
