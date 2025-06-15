@@ -1,4 +1,4 @@
-import { BarCodeScanner } from 'expo-barcode-scanner';
+import { Camera, CameraType, CameraView } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
@@ -37,15 +37,17 @@ function ScreenTest() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const getBarCodeScannerPermissions = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
+    const getCameraPermissions = async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
     };
 
-    getBarCodeScannerPermissions();
+    getCameraPermissions();
   }, []);
 
   const handleBarCodeScanned = ({ data }: { data: string }) => {
+    if (scanned) return;
+
     setScanned(true);
     setIsLoading(true);
 
@@ -123,14 +125,24 @@ function ScreenTest() {
 
       {!scanned ? (
         <View style={styles.scannerContainer}>
-          <BarCodeScanner
-            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          <CameraView
             style={styles.scanner}
-          />
-          <View style={styles.overlay}>
-            <View style={styles.scanArea} />
-          </View>
-          <Text style={styles.scanText}>Coloca el código QR dentro del marco</Text>
+            facing="back"
+            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+            barcodeScannerSettings={{
+              barcodeTypes: ['qr'],
+            }}
+          >
+            <View style={styles.overlay}>
+              <View style={styles.scanArea}>
+                <View style={styles.cornerTL} />
+                <View style={styles.cornerTR} />
+                <View style={styles.cornerBL} />
+                <View style={styles.cornerBR} />
+              </View>
+            </View>
+            <Text style={styles.scanText}>Coloca el código QR dentro del marco</Text>
+          </CameraView>
         </View>
       ) : (
         <View style={styles.resultContainer}>
@@ -203,9 +215,48 @@ const styles = StyleSheet.create({
   scanArea: {
     width: SCAN_AREA_SIZE,
     height: SCAN_AREA_SIZE,
-    borderWidth: 2,
-    borderColor: Colors.primary,
     backgroundColor: 'transparent',
+    position: 'relative',
+  },
+  cornerTL: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: 20,
+    height: 20,
+    borderLeftWidth: 4,
+    borderTopWidth: 4,
+    borderColor: Colors.primary,
+  },
+  cornerTR: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 20,
+    height: 20,
+    borderRightWidth: 4,
+    borderTopWidth: 4,
+    borderColor: Colors.primary,
+  },
+  cornerBL: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: 20,
+    height: 20,
+    borderLeftWidth: 4,
+    borderBottomWidth: 4,
+    borderColor: Colors.primary,
+  },
+  cornerBR: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 20,
+    height: 20,
+    borderRightWidth: 4,
+    borderBottomWidth: 4,
+    borderColor: Colors.primary,
   },
   scanText: {
     position: 'absolute',
