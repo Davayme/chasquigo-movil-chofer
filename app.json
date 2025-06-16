@@ -1,26 +1,39 @@
 {
   "expo": {
-    "name": "chasquigo-movil-chofer",
+    "name": "Chasqui Go - Choféres",
     "slug": "chasquigo-movil-chofer",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/images/icon.png",
-    "scheme": "chasquigomovilchofer",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./src/assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.chasquigomovil",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Esta aplicación necesita acceso a la cámara para escanear códigos QR de tickets."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "package": "com.anonymous.chasquigomovil",
+      "permissions": [
+        "INTERNET",
+        "VIBRATE",
+        "CAMERA"
+      ]
     },
     "web": {
-      "bundler": "metro",
-      "output": "static",
       "favicon": "./src/assets/images/favicon.png"
     },
     "plugins": [
@@ -33,16 +46,28 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Esta aplicación necesita acceso a la cámara para escanear códigos QR de tickets."
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
     },
+    "scheme": "chasquigo-movil-chofer",
     "extra": {
       "router": {
         "origin": false,
         "initialRouteName": "./src/app"
+      },
+      "apiUrl": "https://chasquigo-backend-7yn2.onrender.com",
+      "eas": {
+        "projectId": "99be387b-579c-4a7a-b1b7-28e7936cbdaa"
       }
-    }
+    },
+    "owner": "pumilabs"
   }
 }
