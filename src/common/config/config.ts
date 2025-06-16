@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 
 // Get API URL from app.json
-export const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://chasquigo-backend.onrender.com';
+export const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://chasquigo-backend-7yn2.onrender.com';
 
 export const STRIPE_PUBLISHABLE_KEY = Constants.expoConfig?.extra?.stripePublishableKey || undefined;
 
@@ -15,13 +15,14 @@ export const API_ENDPOINTS = {
   },
   USER: {
     PROFILE: '/users/profile',
-    REGISTER: '/users/client',
+    REGISTER: '/users/register',
+    COOPERATIVE: '/users/cooperative',
   },
   PAYMENTS: {
-    CREATE_PAYMENT_INTENT: '/payments/create-payment-intent',
+    CREATE_PAYMENT_INTENT: '/payments/create-intent',
   },
   QR: {
-    GET_QR: '/qr/demo',
+    GET_QR: '/qr/generate',
   },
 };
 

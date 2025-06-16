@@ -1,25 +1,78 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../../common/components/Header';
 import { Colors } from '../../common/constants/colors';
 import { useAuth } from '../../common/context/AuthContext';
+import { router } from 'expo-router';
+import { authService, Cooperative } from '../../modules/auth/services/authService';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const [cooperative, setCooperative] = useState<Cooperative | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const validateDriverAndLoadData = async () => {
+      try {
+        if (!user) {
+          router.replace('/login');
+          return;
+        }
+
+        if (user.role !== 'DRIVER') {
+          Alert.alert(
+            'Acceso Restringido',
+            'Esta aplicación es exclusiva para choferes. Su cuenta no tiene los permisos necesarios.',
+            [
+              {
+                text: 'Cerrar Sesión',
+                onPress: logout,
+                style: 'destructive',
+              }
+            ],
+            { cancelable: false }
+          );
+          return;
+        }
+
+        const cooperativeData = await authService.getCooperativeInfo(user.id);
+        setCooperative(cooperativeData);
+      } catch (error) {
+        console.error('Error loading profile data:', error);
+        Alert.alert('Error', 'No se pudo cargar la información del perfil');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    validateDriverAndLoadData();
+  }, [user]);
 
   // Get full name or first initial for avatar
   const fullName = user ? `${user.firstName} ${user.lastName}` : 'Usuario';
   const firstInitial = user?.firstName.charAt(0) || 'U';
 
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <StatusBar style="light" />
+        <Header title="Mi Perfil" />
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Cargando información...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <StatusBar style="light" />
-      
+
       <Header title="Mi Perfil" />
-      
+
       <ScrollView style={styles.content}>
         <View style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
@@ -28,78 +81,64 @@ export default function ProfileScreen() {
           <Text style={styles.userName}>{fullName}</Text>
           <Text style={styles.userEmail}>{user?.email || 'usuario@ejemplo.com'}</Text>
         </View>
-        
+
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Información Personal</Text>
-          
+          <Text style={styles.sectionTitle}>Información de la Cooperativa</Text>
+
           <View style={styles.optionItem}>
-            <Ionicons name="person-outline" size={24} color={Colors.primary} style={styles.optionIcon} />
+            <Ionicons name="business-outline" size={24} color={Colors.primary} style={styles.optionIcon} />
             <View style={styles.optionContent}>
-              <Text style={styles.optionTitle}>Editar Perfil</Text>
-              <Text style={styles.optionDescription}>Actualiza tu información personal</Text>
+              <Text style={styles.optionTitle}>{cooperative?.name || 'Cargando...'}</Text>
+              <Text style={styles.optionDescription}>Cooperativa de Transporte</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
           </View>
-          
+
           <View style={styles.optionItem}>
-            <Ionicons name="card-outline" size={24} color={Colors.primary} style={styles.optionIcon} />
+            <Ionicons name="location-outline" size={24} color={Colors.primary} style={styles.optionIcon} />
             <View style={styles.optionContent}>
-              <Text style={styles.optionTitle}>Métodos de Pago</Text>
-              <Text style={styles.optionDescription}>Administra tus tarjetas y métodos de pago</Text>
+              <Text style={styles.optionTitle}>Dirección</Text>
+              <Text style={styles.optionDescription}>{cooperative?.address || 'Cargando...'}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
+          </View>
+
+          <View style={styles.optionItem}>
+            <Ionicons name="call-outline" size={24} color={Colors.primary} style={styles.optionIcon} />
+            <View style={styles.optionContent}>
+              <Text style={styles.optionTitle}>Teléfono</Text>
+              <Text style={styles.optionDescription}>{cooperative?.phone || 'Cargando...'}</Text>
+            </View>
+          </View>
+
+          <View style={styles.optionItem}>
+            <Ionicons name="mail-outline" size={24} color={Colors.primary} style={styles.optionIcon} />
+            <View style={styles.optionContent}>
+              <Text style={styles.optionTitle}>Correo</Text>
+              <Text style={styles.optionDescription}>{cooperative?.email || 'Cargando...'}</Text>
+            </View>
           </View>
         </View>
-        
+
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferencias</Text>
-          
-          <View style={styles.optionItem}>
-            <Ionicons name="notifications-outline" size={24} color={Colors.primary} style={styles.optionIcon} />
-            <View style={styles.optionContent}>
-              <Text style={styles.optionTitle}>Notificaciones</Text>
-              <Text style={styles.optionDescription}>Administra tus notificaciones</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
-          </View>
-          
-          <View style={styles.optionItem}>
-            <Ionicons name="language-outline" size={24} color={Colors.primary} style={styles.optionIcon} />
-            <View style={styles.optionContent}>
-              <Text style={styles.optionTitle}>Idioma</Text>
-              <Text style={styles.optionDescription}>Cambia el idioma de la aplicación</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
-          </View>
-        </View>
-        
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ayuda</Text>
-          
-          <View style={styles.optionItem}>
-            <Ionicons name="help-circle-outline" size={24} color={Colors.primary} style={styles.optionIcon} />
-            <View style={styles.optionContent}>
-              <Text style={styles.optionTitle}>Centro de Ayuda</Text>
-              <Text style={styles.optionDescription}>Preguntas frecuentes y soporte</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
-          </View>
-          
-          <View style={styles.optionItem}>
+          <Text style={styles.sectionTitle}>Información Legal</Text>
+
+          <TouchableOpacity
+            style={styles.optionItem}
+            onPress={() => router.push('/terms')}
+          >
             <Ionicons name="document-text-outline" size={24} color={Colors.primary} style={styles.optionIcon} />
             <View style={styles.optionContent}>
               <Text style={styles.optionTitle}>Términos y Condiciones</Text>
               <Text style={styles.optionDescription}>Política de privacidad y términos de uso</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
-          </View>
+          </TouchableOpacity>
         </View>
-        
+
         <TouchableOpacity style={styles.logoutButton} onPress={logout}>
           <Ionicons name="log-out-outline" size={20} color="#fff" style={styles.logoutIcon} />
           <Text style={styles.logoutText}>Cerrar Sesión</Text>
         </TouchableOpacity>
-        
+
         <View style={styles.versionContainer}>
           <Text style={styles.versionText}>Versión 1.0.0</Text>
         </View>
@@ -115,6 +154,15 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
   },
   profileHeader: {
     alignItems: 'center',
