@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "chasquigo-movil-chofer",
+    "name": "Chasqui Go - Choféres",
     "slug": "chasquigo-movil-chofer",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/images/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./src/assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -16,32 +16,58 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.chasquigomovil"
+      "bundleIdentifier": "com.anonymous.chasquigomovil",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Esta aplicación necesita acceso a la cámara para escanear códigos QR de tickets."
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./src/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.anonymous.chasquigomovil",
       "permissions": [
         "INTERNET",
-        "VIBRATE"
+        "VIBRATE",
+        "CAMERA"
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./src/assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./src/assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Esta aplicación necesita acceso a la cámara para escanear códigos QR de tickets."
+        }
+      ]
     ],
+    "experiments": {
+      "typedRoutes": true
+    },
     "scheme": "chasquigo-movil-chofer",
     "extra": {
-      "router": {},
+      "router": {
+        "origin": false,
+        "initialRouteName": "./src/app"
+      },
+      "apiUrl": "https://chasquigo-backend.onrender.com",
       "eas": {
         "projectId": "99be387b-579c-4a7a-b1b7-28e7936cbdaa"
       }
     },
-    "owner": "wadepar6"
+    "owner": "pumilabs"
   }
 }

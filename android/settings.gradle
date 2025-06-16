@@ -31,7 +31,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
 }
 expoAutolinking.useExpoModules()
 
-rootProject.name = 'chasquigo-movil-chofer'
+rootProject.name = 'Chasqui Go - Choféres'
 
 expoAutolinking.useExpoVersionCatalog()
 
