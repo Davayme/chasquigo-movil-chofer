@@ -70,7 +70,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               // Si el token no es válido, eliminarlo
               await SecureStore.deleteItemAsync(TOKEN_KEY);
               await SecureStore.deleteItemAsync(USER_KEY);
-              console.log('Token no válido, se ha eliminado');
             }
           } catch (validationError) {
             // Si hay un error al validar el token, mantenemos la sesión por defecto

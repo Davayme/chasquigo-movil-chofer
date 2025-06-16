@@ -1,4 +1,5 @@
 import { API_ENDPOINTS, API_URL } from "@/src/common/config/config";
+import { tokenService } from "@/src/common/services/tokenService";
 
 // Interfaces
 export interface User {
@@ -6,10 +7,16 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: {
-    id: number;
-    name: string;
-  };
+  role: string;
+}
+
+export interface Cooperative {
+  id: number;
+  name: string;
+  address: string;
+  logo: string;
+  phone: string;
+  email: string;
 }
 
 export interface LoginResponse {
@@ -33,26 +40,45 @@ export const authService = {
    */
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
-      const response = await fetch(`${API_URL}${API_ENDPOINTS.AUTH.LOGIN}`, {
+      const url = `${API_URL}${API_ENDPOINTS.AUTH.LOGIN}`;
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify(credentials),
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error en la autenticación');
+      // Get the response text first
+      const responseText = await response.text();
+      // Try to parse the response as JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse response as JSON:', parseError);
+        throw new Error('Invalid server response format');
       }
-      
-      return await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Error en la autenticación');
+      }
+
+      // Validate the response structure
+      if (!data.access_token || !data.user) {
+        throw new Error('Invalid response structure from server');
+      }
+
+      // Guardar el token
+      await tokenService.saveToken(data.access_token);
+
+      return data;
     } catch (error) {
       console.error('Error en servicio de login:', error);
       throw error;
     }
   },
-  
+
   /**
    * Valida un token JWT (para verificar si sigue siendo válido)
    * NOTA: Actualmente retorna true siempre ya que el endpoint no está implementado
@@ -61,9 +87,8 @@ export const authService = {
    */
   validateToken: async (token: string): Promise<boolean> => {
     // Temporalmente retornamos true siempre ya que el endpoint no está implementado
-    console.log('Endpoint de validación de token no implementado aún, asumiendo token válido');
     return true;
-    
+
     /* IMPLEMENTACIÓN FUTURA
     try {
       const response = await fetch(`${API_URL}${API_ENDPOINTS.AUTH.VALIDATE_TOKEN}`, {
@@ -97,5 +122,50 @@ export const authService = {
       return true;
     }
     */
+  },
+
+  /**
+   * Obtiene la información de la cooperativa del usuario
+   * @param userId ID del usuario
+   * @returns Información de la cooperativa
+   */
+  getCooperativeInfo: async (userId: number): Promise<Cooperative> => {
+    try {
+      const token = await tokenService.getToken();
+      if (!token) {
+        throw new Error('No hay token de autenticación');
+      }
+
+      const url = `${API_URL}${API_ENDPOINTS.USER.COOPERATIVE}/${userId}`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      // Get the response text first
+      const responseText = await response.text();
+
+      // Try to parse the response as JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse response as JSON:', parseError);
+        throw new Error('Invalid server response format');
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al obtener información de la cooperativa');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error al obtener información de la cooperativa:', error);
+      throw error;
+    }
   }
 }; 
