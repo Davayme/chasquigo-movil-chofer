@@ -7,7 +7,7 @@
     "icon": "./src/assets/images/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./src/assets/images/splash.png",
+      "image": "./src/assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -16,7 +16,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.chasquigomovil"
+      "bundleIdentifier": "com.anonymous.chasquigomovil",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Esta aplicación necesita acceso a la cámara para escanear códigos QR de tickets."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +29,8 @@
       "package": "com.anonymous.chasquigomovil",
       "permissions": [
         "INTERNET",
-        "VIBRATE"
+        "VIBRATE",
+        "CAMERA"
       ]
     },
     "web": {
@@ -41,6 +45,12 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Esta aplicación necesita acceso a la cámara para escanear códigos QR de tickets."
         }
       ]
     ],
