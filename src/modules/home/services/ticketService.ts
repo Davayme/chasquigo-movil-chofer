@@ -88,4 +88,25 @@ export const ticketService = {
         }
         return data;
     },
+    validateQR: async (qrData: string) => {
+        const response = await fetch(`${API_URL}/tickets-history/validate-qr`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ qrData }),
+        });
+        const responseText = await response.text();
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (e) {
+            throw new Error('Respuesta inválida del servidor');
+        }
+        if (!response.ok) {
+            throw new Error(data.message || 'Error al validar el QR');
+        }
+        return data;
+    },
 }; 

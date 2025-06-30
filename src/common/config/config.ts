@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 
 // Get API URL from app.json
-export const API_URL = 'http://192.168.100.13:3000';
+export const API_URL = 'http://45.14.225.213:3000';
 // export const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://45.14.225.213:3000/api/v1/';
 
 export const STRIPE_PUBLISHABLE_KEY = Constants.expoConfig?.extra?.stripePublishableKey || undefined;

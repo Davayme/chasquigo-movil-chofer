@@ -159,10 +159,6 @@ export default function LoginScreen() {
                     <Text style={styles.fieldErrorText}>{errors.password}</Text>
                 ) : null}
 
-                <TouchableOpacity style={styles.forgotPassword}>
-                    <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
-                </TouchableOpacity>
-
                 <TouchableOpacity
                     style={[
                         styles.loginButton,
@@ -177,13 +173,6 @@ export default function LoginScreen() {
                         <Text style={styles.loginButtonText}>Ingresar</Text>
                     )}
                 </TouchableOpacity>
-
-                <View style={styles.registerContainer}>
-                    <Text style={styles.registerText}>¿No tienes una cuenta? </Text>
-                    <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-                        <Text style={styles.registerLink}>Regístrate</Text>
-                    </TouchableOpacity>
-                </View>
             </View>
         </KeyboardAvoidingView>
     );
