@@ -88,8 +88,8 @@ export default function ProfileScreen() {
           <View style={styles.optionItem}>
             <Ionicons name="business-outline" size={24} color={Colors.primary} style={styles.optionIcon} />
             <View style={styles.optionContent}>
-              <Text style={styles.optionTitle}>{cooperative?.name || 'Cargando...'}</Text>
-              <Text style={styles.optionDescription}>Cooperativa de Transporte</Text>
+              <Text style={styles.optionTitle}>Cooperativa</Text>
+              <Text style={styles.optionDescription}>{cooperative?.name || 'Cargando...'}</Text>
             </View>
           </View>
 

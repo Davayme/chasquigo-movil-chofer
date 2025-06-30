@@ -11,40 +11,40 @@ export default function LoginScreen() {
     const { login, isLoading } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [errors, setErrors] = useState<{email?: string, password?: string, general?: string}>({});
-    const [touched, setTouched] = useState<{email: boolean, password: boolean}>({email: false, password: false});
+    const [errors, setErrors] = useState<{ email?: string, password?: string, general?: string }>({});
+    const [touched, setTouched] = useState<{ email: boolean, password: boolean }>({ email: false, password: false });
 
     // Validate email
     const validateEmail = (email: string): boolean => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isValid = emailRegex.test(email);
-        
+
         if (!isValid && touched.email) {
-            setErrors(prev => ({...prev, email: 'Ingresa un correo electrónico válido'}));
+            setErrors(prev => ({ ...prev, email: 'Ingresa un correo electrónico válido' }));
         } else {
-            setErrors(prev => ({...prev, email: undefined}));
+            setErrors(prev => ({ ...prev, email: undefined }));
         }
-        
+
         return isValid;
     };
 
     // Validate password
     const validatePassword = (password: string): boolean => {
         const isValid = password.length >= 6;
-        
+
         if (!isValid && touched.password) {
-            setErrors(prev => ({...prev, password: 'La contraseña debe tener al menos 6 caracteres'}));
+            setErrors(prev => ({ ...prev, password: 'La contraseña debe tener al menos 6 caracteres' }));
         } else {
-            setErrors(prev => ({...prev, password: undefined}));
+            setErrors(prev => ({ ...prev, password: undefined }));
         }
-        
+
         return isValid;
     };
 
     // Handle field blur
     const handleBlur = (field: 'email' | 'password') => {
-        setTouched(prev => ({...prev, [field]: true}));
-        
+        setTouched(prev => ({ ...prev, [field]: true }));
+
         if (field === 'email') {
             validateEmail(email);
         } else {
@@ -54,8 +54,8 @@ export default function LoginScreen() {
 
     const handleLogin = async () => {
         // Mark all fields as touched
-        setTouched({email: true, password: true});
-        
+        setTouched({ email: true, password: true });
+
         // Validate all fields
         const isEmailValid = validateEmail(email);
         const isPasswordValid = validatePassword(password);
@@ -65,54 +65,54 @@ export default function LoginScreen() {
         }
 
         // Clear general error
-        setErrors(prev => ({...prev, general: undefined}));
-        
+        setErrors(prev => ({ ...prev, general: undefined }));
+
         // Attempt login
         const success = await login(email, password);
-        
+
         if (success) {
             router.replace('/(tabs)/home');
         } else {
-            setErrors(prev => ({...prev, general: 'Credenciales incorrectas. Intenta nuevamente.'}));
+            setErrors(prev => ({ ...prev, general: 'Credenciales incorrectas. Intenta nuevamente.' }));
         }
     };
 
     return (
-        <KeyboardAvoidingView 
+        <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.container}
         >
             <StatusBar style="dark" />
-            
+
             <View style={styles.logoContainer}>
-                <Image 
+                <Image
                     source={require('../../../assets/images/logo.png')}
                     style={styles.logo}
                     contentFit="contain"
                 />
                 <Text style={styles.appName}>Chasqui-Go</Text>
-                
+
             </View>
-            
+
             <View style={styles.formContainer}>
                 <Text style={styles.title}>Iniciar Sesión</Text>
-                
+
                 {errors.general ? (
                     <View style={styles.errorContainer}>
                         <Ionicons name="alert-circle-outline" size={20} color={Colors.danger} />
                         <Text style={styles.errorText}>{errors.general}</Text>
                     </View>
                 ) : null}
-                
+
                 <View style={[
-                    styles.inputContainer, 
+                    styles.inputContainer,
                     errors.email ? styles.inputError : null
                 ]}>
-                    <Ionicons 
-                        name="mail-outline" 
-                        size={22} 
-                        color={errors.email ? Colors.danger : Colors.textSecondary} 
-                        style={styles.inputIcon} 
+                    <Ionicons
+                        name="mail-outline"
+                        size={22}
+                        color={errors.email ? Colors.danger : Colors.textSecondary}
+                        style={styles.inputIcon}
                     />
                     <TextInput
                         style={styles.input}
@@ -131,16 +131,16 @@ export default function LoginScreen() {
                 {errors.email ? (
                     <Text style={styles.fieldErrorText}>{errors.email}</Text>
                 ) : null}
-                
+
                 <View style={[
-                    styles.inputContainer, 
+                    styles.inputContainer,
                     errors.password ? styles.inputError : null
                 ]}>
-                    <Ionicons 
-                        name="lock-closed-outline" 
-                        size={22} 
-                        color={errors.password ? Colors.danger : Colors.textSecondary} 
-                        style={styles.inputIcon} 
+                    <Ionicons
+                        name="lock-closed-outline"
+                        size={22}
+                        color={errors.password ? Colors.danger : Colors.textSecondary}
+                        style={styles.inputIcon}
                     />
                     <TextInput
                         style={styles.input}
@@ -158,12 +158,8 @@ export default function LoginScreen() {
                 {errors.password ? (
                     <Text style={styles.fieldErrorText}>{errors.password}</Text>
                 ) : null}
-                
-                <TouchableOpacity style={styles.forgotPassword}>
-                    <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                     style={[
                         styles.loginButton,
                         (!email || !password) ? styles.loginButtonDisabled : null
@@ -177,13 +173,6 @@ export default function LoginScreen() {
                         <Text style={styles.loginButtonText}>Ingresar</Text>
                     )}
                 </TouchableOpacity>
-                
-                <View style={styles.registerContainer}>
-                    <Text style={styles.registerText}>¿No tienes una cuenta? </Text>
-                    <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-                        <Text style={styles.registerLink}>Regístrate</Text>
-                    </TouchableOpacity>
-                </View>
             </View>
         </KeyboardAvoidingView>
     );
