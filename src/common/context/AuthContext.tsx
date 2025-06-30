@@ -43,17 +43,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const storedToken = await SecureStore.getItemAsync(TOKEN_KEY);
         const storedUser = await SecureStore.getItemAsync(USER_KEY);
-        
+
         if (storedToken) {
           // Temporalmente asumimos que cualquier token almacenado es válido
           // ya que aún no tenemos el endpoint de validación en el backend
           setToken(storedToken);
           setIsAuthenticated(true);
-          
+
           if (storedUser) {
             setUser(JSON.parse(storedUser));
           }
-          
+
           /* CÓDIGO COMENTADO - IMPLEMENTAR CUANDO EL ENDPOINT ESTÉ DISPONIBLE
           try {
             // Validar el token antes de usarlo
@@ -105,29 +105,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Usar el servicio de autenticación para hacer login
       const response = await authService.login({ email, password });
-      
+
       // Guardar el token en SecureStore
       await SecureStore.setItemAsync(TOKEN_KEY, response.access_token);
       await SecureStore.setItemAsync(USER_KEY, JSON.stringify(response.user));
-      
+
       // Actualizar el estado
       setToken(response.access_token);
       setUser(response.user);
       setIsAuthenticated(true);
-      
+
       Toast.show({
         type: 'success',
         text1: '¡Bienvenido!',
         text2: `Hola, ${response.user.firstName}`
       });
-      
+
       return true;
     } catch (error) {
       console.error('Error en login:', error);
+
+      // Show specific error messages based on the error type
+      let errorMessage = 'Error de autenticación';
+      let errorTitle = 'Error';
+
+      if (error instanceof Error) {
+        const errorText = error.message;
+
+        if (errorText.includes('suspendido')) {
+          errorTitle = 'Servicio No Disponible';
+          errorMessage = 'El backend está suspendido. Contacta al administrador.';
+        } else if (errorText.includes('no está disponible')) {
+          errorTitle = 'Servidor No Disponible';
+          errorMessage = 'El servidor no está respondiendo. Intenta más tarde.';
+        } else if (errorText.includes('Credenciales incorrectas')) {
+          errorTitle = 'Credenciales Inválidas';
+          errorMessage = 'Email o contraseña incorrectos.';
+        } else if (errorText.includes('endpoint')) {
+          errorTitle = 'Error de Configuración';
+          errorMessage = 'Problema con la configuración del backend.';
+        } else if (errorText.includes('conexión')) {
+          errorTitle = 'Error de Conexión';
+          errorMessage = 'No se pudo conectar al servidor. Verifica tu internet.';
+        } else {
+          errorMessage = errorText;
+        }
+      }
+
       Toast.show({
         type: 'error',
-        text1: 'Error de autenticación',
-        text2: 'Credenciales incorrectas'
+        text1: errorTitle,
+        text2: errorMessage
       });
       return false;
     } finally {
@@ -141,19 +169,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Eliminar el token y la información del usuario
       await SecureStore.deleteItemAsync(TOKEN_KEY);
       await SecureStore.deleteItemAsync(USER_KEY);
-      
+
       // Limpiar el estado
       setToken(null);
       setUser(null);
       setIsAuthenticated(false);
-      
+
       // Mostrar mensaje
       Toast.show({
         type: 'success',
         text1: 'Sesión cerrada',
         text2: 'Has cerrado sesión correctamente'
       });
-      
+
       // Redireccionar a la pantalla de login
       router.replace('/(auth)/login');
     } catch (error) {

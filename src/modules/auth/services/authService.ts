@@ -41,6 +41,9 @@ export const authService = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
       const url = `${API_URL}${API_ENDPOINTS.AUTH.LOGIN}`;
+      console.log('Login URL:', url);
+      console.log('Credentials:', { email: credentials.email, password: '***' });
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -49,25 +52,62 @@ export const authService = {
         },
         body: JSON.stringify(credentials),
       });
+
       // Get the response text first
       const responseText = await response.text();
+      console.log('Response status:', response.status);
+      console.log('Response text:', responseText);
+
+      // Check for service suspension or server errors
+      if (response.status === 503) {
+        if (responseText.includes('Service Suspended') || responseText.includes('suspended')) {
+          throw new Error('El servicio del backend está suspendido. Por favor, contacta al administrador.');
+        }
+        throw new Error('El servidor no está disponible temporalmente. Intenta más tarde.');
+      }
+
+      if (response.status >= 500) {
+        throw new Error('Error interno del servidor. Intenta más tarde.');
+      }
+
       // Try to parse the response as JSON
       let data;
       try {
         data = JSON.parse(responseText);
       } catch (parseError) {
         console.error('Failed to parse response as JSON:', parseError);
-        throw new Error('Invalid server response format');
+        console.error('Response text:', responseText);
+
+        // Check if it's an HTML error page
+        if (responseText.includes('<!DOCTYPE html>') || responseText.includes('<html>')) {
+          throw new Error('El servidor está devolviendo una página de error. Verifica que el backend esté funcionando.');
+        }
+
+        throw new Error('El servidor devolvió una respuesta inválida. Verifica la conexión.');
       }
 
       if (!response.ok) {
-        throw new Error(data.message || 'Error en la autenticación');
+        // Handle specific HTTP errors
+        if (response.status === 401) {
+          throw new Error('Credenciales incorrectas. Verifica tu email y contraseña.');
+        }
+        if (response.status === 404) {
+          throw new Error('El endpoint de login no fue encontrado. Verifica la configuración del backend.');
+        }
+        if (response.status === 422) {
+          throw new Error('Datos de entrada inválidos. Verifica el formato de tu email.');
+        }
+
+        throw new Error(data.message || `Error del servidor (${response.status}): ${response.statusText}`);
       }
 
       // Validate the response structure
       if (!data.access_token || !data.user) {
-        throw new Error('Invalid response structure from server');
+        console.error('Invalid response structure:', data);
+        throw new Error('El servidor devolvió una respuesta incompleta. Falta el token o información del usuario.');
       }
+
+      console.log('Login successful, user:', data.user.firstName);
 
       // Guardar el token
       await tokenService.saveToken(data.access_token);

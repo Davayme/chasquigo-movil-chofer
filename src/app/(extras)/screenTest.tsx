@@ -2,6 +2,7 @@ import { Camera, CameraType, CameraView } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
+import { router } from 'expo-router';
 import { Colors } from '@/src/common/constants/colors';
 import { showToast } from '@/src/common/components/Toast';
 import Header from '@/src/common/components/Header';
@@ -97,6 +98,10 @@ function ScreenTest() {
     setTicketData(null);
   };
 
+  const handleViewTrips = () => {
+    router.push('/(tabs)/trips');
+  };
+
   if (hasPermission === null) {
     return (
       <View style={styles.container}>
@@ -143,6 +148,12 @@ function ScreenTest() {
             </View>
             <Text style={styles.scanText}>Coloca el código QR dentro del marco</Text>
           </CameraView>
+
+          {/* Viajes próximos button */}
+          <TouchableOpacity style={styles.tripsButton} onPress={handleViewTrips}>
+            <Ionicons name="car-outline" size={24} color="#fff" />
+            <Text style={styles.tripsButtonText}>Mirar viajes próximos</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <View style={styles.resultContainer}>
@@ -174,6 +185,11 @@ function ScreenTest() {
           <TouchableOpacity style={styles.scanAgainButton} onPress={handleScanAgain}>
             <Ionicons name="scan-outline" size={24} color="#fff" />
             <Text style={styles.scanAgainText}>Escanear de nuevo</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.tripsButton} onPress={handleViewTrips}>
+            <Ionicons name="car-outline" size={24} color="#fff" />
+            <Text style={styles.tripsButtonText}>Mirar viajes próximos</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -321,6 +337,21 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   scanAgainText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  tripsButton: {
+    backgroundColor: Colors.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  tripsButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
