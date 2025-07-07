@@ -35,10 +35,45 @@ export default function TicketsScreen() {
         }
     };
 
+    // Simulate manual payment boarding for PENDING tickets
+    const handleManualBoarding = (ticketId: number) => {
+        setAbordando(ticketId);
+        setTimeout(() => {
+            setTickets((prev) =>
+                prev.map((t) =>
+                    t.id === ticketId ? { ...t, status: 'BOARDED' } : t
+                )
+            );
+            setAbordando(null);
+            Alert.alert('Éxito', 'Abordaje exitoso con pago manual. Guardado para el sistema central');
+        }, 1000);
+    };
+
     const getStatusColor = (status: string) => {
         if (["USED", "CANCELLED", "EXPIRED"].includes(status)) return styles.statusRed;
         if (status === "CONFIRMED") return styles.statusGreen;
         return styles.statusOrange;
+    };
+
+    const getStatusText = (status: string) => {
+        switch (status) {
+            case 'PENDING':
+                return 'Pendiente de pago';
+            case 'PAID':
+                return 'Pagado';
+            case 'CONFIRMED':
+                return 'Confirmado';
+            case 'BOARDED':
+                return 'Abordado';
+            case 'USED':
+                return 'Viaje completado';
+            case 'CANCELLED':
+                return 'Cancelado';
+            case 'EXPIRED':
+                return 'Expirado';
+            default:
+                return status;
+        }
     };
 
     return (
@@ -62,7 +97,7 @@ export default function TicketsScreen() {
                         <View style={styles.ticketCard}>
                             <View style={styles.ticketHeader}>
                                 <Text style={styles.ticketId}>Ticket #{item.id}</Text>
-                                <Text style={[styles.status, getStatusColor(item.status)]}>{item.status}</Text>
+                                <Text style={[styles.status, getStatusColor(item.status)]}>{getStatusText(item.status)}</Text>
                             </View>
                             <Text style={styles.route}>{item.originCity} → {item.destinationCity}</Text>
                             <Text style={styles.price}>
@@ -86,6 +121,15 @@ export default function TicketsScreen() {
                                     disabled={abordando === item.id}
                                 >
                                     <Text style={styles.abordarButtonText}>{abordando === item.id ? 'Abordando...' : 'ABORDAR'}</Text>
+                                </TouchableOpacity>
+                            )}
+                            {item.status === 'PENDING' && (
+                                <TouchableOpacity
+                                    style={styles.abordarButton}
+                                    onPress={() => handleManualBoarding(item.id)}
+                                    disabled={abordando === item.id}
+                                >
+                                    <Text style={styles.abordarButtonText}>{abordando === item.id ? 'Abordando...' : 'Abordar con paga manual'}</Text>
                                 </TouchableOpacity>
                             )}
                         </View>

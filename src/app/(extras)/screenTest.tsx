@@ -40,6 +40,28 @@ interface ValidationResponse {
 const { width } = Dimensions.get('window');
 const SCAN_AREA_SIZE = width * 0.7;
 
+// Helper to translate ticket status to Spanish
+const getStatusText = (status: string) => {
+  switch (status) {
+    case 'PENDING':
+      return 'Pendiente de pago';
+    case 'PAID':
+      return 'Pagado';
+    case 'CONFIRMED':
+      return 'Confirmado';
+    case 'BOARDED':
+      return 'Abordado';
+    case 'USED':
+      return 'Viaje completado';
+    case 'CANCELLED':
+      return 'Cancelado';
+    case 'EXPIRED':
+      return 'Expirado';
+    default:
+      return status;
+  }
+};
+
 function ScreenTest() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
@@ -214,7 +236,7 @@ function ScreenTest() {
                   <Text style={styles.ticketTitle}>Ticket #{ticketData.ticketId}</Text>
                   <Text style={styles.ticketSubtitle}>{ticketData.qrCode}</Text>
                   <Text style={[styles.ticketStatus, { color: validationResult.isValid ? Colors.success : Colors.error, marginTop: 4 }]}>
-                    {validationResult.message}
+                    {getStatusText(validationResult.message)}
                   </Text>
                 </View>
 
@@ -253,7 +275,7 @@ function ScreenTest() {
                   <Ionicons name="alert-circle" size={40} color={Colors.error} />
                   <Text style={[styles.ticketTitle, { color: Colors.error }]}>Ticket no válido</Text>
                 </View>
-                <Text style={[styles.ticketStatus, { color: Colors.error, marginTop: 10 }]}>{validationResult.message}</Text>
+                <Text style={[styles.ticketStatus, { color: Colors.error, marginTop: 10 }]}>{getStatusText(validationResult.message)}</Text>
                 <TouchableOpacity style={styles.scanAgainButton} onPress={handleScanAgain}>
                   <Ionicons name="scan-outline" size={24} color="#fff" />
                   <Text style={styles.scanAgainText}>Escanear de nuevo</Text>
